@@ -1,0 +1,41 @@
+//@version=5
+indicator(title="Close == High Detector", overlay=true, max_bars_back=500)
+
+// ─── Settings ──────────────────────────────────────────────────────────────
+showLabel     = input.bool(true,  "Show labels")
+showBgColor   = input.bool(true,  "Highlight bar background")
+markerColor   = input.color(color.new(color.green, 0),  "Marker color")
+bgHighlight   = input.color(color.new(color.green, 80), "Background highlight color")
+labelText     = input.string("C=H", "Label text")
+
+// ─── Condition ─────────────────────────────────────────────────────────────
+closeEqualsHigh = close == high
+
+// ─── Background highlight ──────────────────────────────────────────────────
+bgcolor(closeEqualsHigh and showBgColor ? bgHighlight : na, title="C=H Highlight")
+
+// ─── Marker (triangle below bar) ───────────────────────────────────────────
+plotshape(
+     series    = closeEqualsHigh,
+     title     = "Close == High",
+     style     = shape.triangleup,
+     location  = location.belowbar,
+     color     = markerColor,
+     size      = size.small
+ )
+
+// ─── Label above the high ──────────────────────────────────────────────────
+if closeEqualsHigh and showLabel
+    label.new(
+         x       = bar_index,
+         y       = high,
+         text    = labelText,
+         style   = label.style_label_down,
+         color   = markerColor,
+         textcolor = color.white,
+         size    = size.small,
+         yloc    = yloc.abovebar
+     )
+
+// ─── Alert ─────────────────────────────────────────────────────────────────
+alertcondition(closeEqualsHigh, title="Close equals High", message="Bar closed at its high — potential bullish strength.")
